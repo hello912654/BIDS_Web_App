@@ -1,0 +1,41 @@
+﻿@model BIDSMonitor.Model.Flight
+
+@{
+    ViewData["Title"] = "更新航班資訊";
+}
+
+<h1>更新航班資訊</h1>
+
+<form asp-action="UpdatePost" method="post">
+    @Html.HiddenFor(model => model.Id)
+    <div>
+        <label for="FlightNo">航班號:</label>
+        <input type="text" id="FlightNo" name="FlightNo" value="@Model?.FlightNo" required />
+    </div>
+    <div>
+        <label for="DepartureGate">登機口:</label>
+        <input type="text" id="DepartureGate" name="DepartureGate" value="@Model?.DepartureGate" />
+    </div>
+
+    <div>
+        <label for="CheckinCount">報到:</label>
+        <input type="text" id="CheckinCount" name="CheckinCount" value="@Model?.CheckinCount" />
+    </div>
+
+    <div>
+        <label for="SortingCount">分揀:</label>
+        <input type="text" id="SortingCount" name="SortingCount" value="@Model?.SortingCount" />
+    </div>
+
+    <div>
+        <label for="BRSCount">BRS:</label>
+        <input type="text" id="BRSCount" name="BRSCount" value="@Model?.BRSCount" />
+    </div>
+    
+    <button type="submit">更新航班資訊</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <div style="color: green;">@ViewBag.Message</div>
+}
