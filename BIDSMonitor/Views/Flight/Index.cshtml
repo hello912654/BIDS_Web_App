@@ -1,0 +1,172 @@
+﻿@using BIDSMonitor.Resources
+
+@{
+    ViewData["Title"] = "BIDS";
+}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
+        
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css">
+
+        <style>
+            html, body {
+                height: 70%; 
+                margin: 0;
+                padding: 0;
+                background-color: #1b2631; 
+                color: white; 
+            }
+
+            .content {
+                /*padding: 10px;*/ /* distance from edge */
+                min-height: calc(100% - 20px);
+            }
+            table {
+            font-weight: bold;
+            height: 30vh; 
+                
+            }
+
+            th, td {
+                text-align: center; 
+            }
+
+            .table-bordered {
+                /*border-collapse: collapse;*/
+                width: 100%;
+                border: none;
+                background-color: #000;
+                color: white;
+                /* border: 1px solid black; */
+                border: none;
+                table-layout: fixed;
+            }
+
+            .table-bordered td, .table-bordered th {
+                border-left: none; 
+                border-right: none; 
+                border-top: none; 
+                border-bottom: 1px solid black; 
+            }
+
+
+            .footer-bar {
+                height: 20px; 
+                background-color: green;
+                margin-top: 100px;
+            }
+
+            .header-bar {
+                height: 40px; 
+                background-color: green;
+                color: white;
+                display: flex;
+                justify-content: flex-end;
+                padding-right: 20px;
+                align-items: center;
+            }
+
+            
+        </style>
+      
+    </head>
+
+    <body>
+    <div class="header-bar"><span style="font-weight: bold;" id="currentTime">loading...</span></div>
+        <div class="content">
+            <table class="table-bordered">
+                <thead>
+                    <tr class="table-active">
+                        <th>@Resource.flight_carouselNo</th>
+                        <th>@Resource.flight_flightNo</th>
+                        <th>@Resource.flight_flightTo</th>
+                        <th>@Resource.flight_departureGate</th>
+                        <th>@Resource.flight_ETD</th>
+                        <th>@Resource.flight_checkinCount</th>
+                        <th>@Resource.flight_sortingCount</th>
+                        <th>BRS</th>
+                        <th>@Resource.flight_differenceCount</th>
+                    </tr>
+                </thead>
+                <tbody id="flightInfoTable">
+                <tr style="background-color:#bee5eb;">
+                    <td colspan="9" style="color:black; height: 20px; text-align: center;">@Resource.action_loading...</td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="footer-bar"></div>
+
+    <script src="~/js/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/flightHub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("Connected to SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("ReceiveFlightUpdate", function (flight) {
+            const table = document.getElementById("flightInfoTable");
+            table.innerHTML = '';
+            let isFirstRow = true;
+
+
+            flight.forEach((carousel) => {
+                carousel.flights.forEach((flight, index) => {
+                    let rowStyle = '';
+                    if(isFirstRow){
+                        rowStyle = 'class="bg-danger"';
+                        isFirstRow = false;
+                    }else{
+                        rowStyle = 'class="bg-primary"';
+                    }
+
+                    const formattedETD = flight.etd ? new Date(flight.etd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A';
+
+                    const row = `<tr ${rowStyle}>
+                        <td>${carousel.carouselNo}</td>
+                        <td>${flight.flightNo}</td>
+                        <td>${flight.flightTo}</td>
+                        <td>${flight.departureGate}</td>
+                        <td>${formattedETD}</td>
+                        <td>${flight.checkinCount}</td>
+                        <td>${flight.sortingCount}</td>
+                        <td>${flight.brsCount}</td>
+                        <td>${flight.differenceCount}</td>
+                    </tr>`;
+
+                    table.innerHTML += row;
+                });
+            })
+
+        });
+
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+
+        updateTime(); 
+        setInterval(updateTime, 60000); // update in 60 seconds
+    </script>
+    </body>
+
+
+</html>
+
+
+
