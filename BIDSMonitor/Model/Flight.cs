@@ -11,10 +11,6 @@ namespace BIDSMonitor.Model
         public string? FlightNo { get; set; }
         [Column("flight_type")]
         public string? FlightType { get; set; }
-        [Column("airline_icao")]
-        public string? AirlineICAO { get; set; }
-        [Column("airline_name")]
-        public string? AirlineName { get; set; }
         [Column("aircraft_type_icao")]
         public string? AircraftTypeICAO { get; set; }
         [Column("aircraft_type_iata")]
