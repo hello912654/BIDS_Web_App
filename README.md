@@ -1,76 +1,76 @@
-# Asp net core demo
-This is a simple demo for baggage information display system
+# Baggage Information Display System (ASP.NET Core Demo)
 
-- build with **ASP.NET Core**
-# Note
+This is a simple ASP.NET Core MVC demo project for a baggage information display system, designed for use in airport environments. It includes real-time flight and baggage updates using SignalR, and demonstrates a clean architecture with practical features.
 
-* Create SignalR hub to push messages to clients
+## Technologies Used
 
-` \ConnectionHub\FlightHub.cs `
+- ASP.NET Core MVC  
+- SignalR for real-time communication  
+- Razor Views for frontend rendering  
+- SQL Server for data storage
 
+## Project Structure and Key Components
 
+### Real-time Updates via SignalR
 
-***
-* Create a service to fetch flight data from the server
-* Use `IHubContext<FlightHub>` to create a connection to the hub
+- **FlightHub.cs**  
+  Located at: `\ConnectionHub\FlightHub.cs`  
+  Implements the SignalR hub for pushing real-time flight and baggage updates to clients.
 
-` \Service\FlightUpdateService.cs `
+- **FlightUpdateService.cs**  
+  Located at: `\Service\FlightUpdateService.cs`  
+  Background service that periodically fetches updated flight data and sends it to clients via `IHubContext<FlightHub>`.
 
+- **Configuration (`appsettings.json`)**
 
-
-***
-
-`appsettings.json`
-
-````json
+```json
 "UpdateIntervalSeconds": 60
-````
-#### UpdateIntervalSeconds : Interval to fetch data from the server (default : 60 seconds)
+```
 
-***
-`Program.cs`
+`UpdateIntervalSeconds` defines the polling interval in seconds. Default is 60 seconds.
 
-````csharp
- app.MapHub<FlightHub>("/flighthub");  
-````
-#### Add multiple hubs by add `MapHub`
+- **SignalR Hub Registration (Program.cs)**
 
-***
-`Views\Flight\Index.cshtml`
-#### Use JavaScript to connect to the SignalR hub
+```csharp
+app.MapHub<FlightHub>("/flighthub");
+```
 
-````javascript
-<script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/flightHub")
-            .build();
+Use `MapHub` to register additional hubs if needed.
 
-        connection.start().then(function () {
-            console.log("Connected to SignalR Hub");
-        }).catch(function (err) {
-            return console.error(err.toString());
-        });
+### Frontend (View Layer)
 
-        connection.on("ReceiveFlightUpdate", function (flight) {
-			...
-		});
-</script>
-````
-- ### ASP.NET Core MVC Application
+- **Index.cshtml**  
+  Located at: `\Views\Flight\Index.cshtml`  
+  JavaScript code establishes a connection to the SignalR hub and handles incoming updates.
 
-- Built with the **Model-View-Controller (MVC)** design pattern
-- Combines backend logic and frontend rendering in a unified web project
-- Views are rendered dynamically using Razor syntax
-- Controllers handle request routing, business logic, and data transformation
-- Models represent flight, baggage, and carousel data from the database
-  
-### Database (SQL Server)
-### Key Features
+```javascript
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/flighthub")
+    .build();
 
-- ASP.NET Core MVC-based clean architecture
-- Real-time display of baggage and flight information
-- Easy to maintain and extend
- 
+connection.start().then(() => {
+    console.log("Connected to SignalR Hub");
+}).catch(err => console.error(err.toString()));
 
- 
-    
+connection.on("ReceiveFlightUpdate", function (flight) {
+    // Handle flight data
+});
+```
+
+## Features
+
+- Clean and modular ASP.NET Core MVC architecture  
+- Real-time updates using SignalR  
+- Integration with SQL Server  
+- Easy to maintain and extend  
+- Combines backend logic with dynamic frontend rendering
+
+## Database
+
+- Supports tables for flight, baggage, and carousel information  
+- Uses SQL Server  
+- Schema can be extended depending on system requirements
+
+## Notes
+
+This project is intended for demonstration purposes and learning. It showcases real-time update patterns and MVC design, but does not include full authentication or production-level configurations.
